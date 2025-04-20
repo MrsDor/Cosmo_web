@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Интерактивная модель Солнечной системы</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #info {
+            position: absolute;
+            top: 90px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            font-size: 29px;
+            text-shadow: 0 0 10px #fff;
+        }
+        #tutorial {
+            position: absolute;
+            top: 130px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            font-size: 20px;
+            text-shadow: 0 0 10px #fff;
+
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+        }
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #555;
+            transform: scale(1.05);
+        }
+        #planet-info {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 5px;
+            max-width: 300px;
+            display: none;
+            border: 1px solid #444;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        #planet-info h3 {
+            color: #ffcc00;
+            margin-top: 0;
+        }
+        #planet-info a {
+            color: #4da6ff;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        #planet-info a:hover {
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">COSMO</div>
+    <nav>
+        <ul>
+            <li><a href="index.html" onclick="showPage('home')">Главная</a></li>
+            <li><a href="model.html" onclick="showSolarSystem()">Солнечная система</a></li>
+            <li><a href="cosmonavts.html" onclick="showPage('planets')">Космонавты</a></li>
+            <li><a href="ссс.html" onclick="showPage('missions')">Явления</a></li>
+            <li><a href="stars.html" onclick="showPage('about')">Звезды</a></li>
+        </ul>
+    </nav>
+
+    <div id="info">Солнечная система</div>
+    <div id="controls">
+        <button id="speed-up">Ускорить (×)</button>
+        <button id="speed-down">Замедлить (÷)</button>
+        <button id="pause">Пауза (⏸)</button>
+        <button id="reset">Сброс (↻)</button>
+    </div>
+    <div id="tutorial">Поставьте на паузу и нажмите на планету</div>
+    <div id="planet-info"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script>
+        // Инициализация сцены, камеры и рендерера
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000);
+        renderer.shadowMap.enabled = false; // Отключаем тени
+        document.body.appendChild(renderer.domElement);
+
+        // Добавление звездного фона
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.1,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        const starsVertices = [];
+        for (let i = 0; i < 10000; i++) {
+            const x = (Math.random() - 0.5) * 2000;
+            const y = (Math.random() - 0.5) * 2000;
+            const z = (Math.random() - 0.5) * 2000;
+            starsVertices.push(x, y, z);
+        }
+
+        starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+
+        // Настройка камеры и элементов управления
+        camera.position.set(0, 50, 150);
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 20;
+        controls.maxDistance = 300;
+
+        // Параметры планет с более яркими цветами и свечением
+        const planets = [
+            { 
+                name: "Солнце", 
+                radius: 6, 
+                color: 0xFFD700, // Более желтый цвет
+                distance: 0, 
+                speed: 0, 
+                rotationSpeed: 0.01, 
+                emissive: 0xFFD700, // Свечение желтым
+                emissiveIntensity: 1.5, // Усиленное свечение
+                info: "Звезда класса G2V. Составляет 99.86% массы Солнечной системы. Температура ядра: 15 млн °C, поверхности: 5500°C.",
+                link: 'sun.html'
+            },
+            { 
+                name: "Меркурий", 
+                radius: 1.5, 
+                color: 0xD3D3D3, 
+                distance: 15, 
+                speed: 0.04, 
+                rotationSpeed: 0.004,
+                emissive: 0xD3D3D3,
+                emissiveIntensity: 0.3,
+                info: "Ближайшая к Солнцу планета. Температура от -180°C до +430°C. Не имеет атмосферы и спутников.",
+                link: 'mercury.html'
+            },
+            { 
+                name: "Венера", 
+                radius: 3.7, 
+                color: 0xFFA07A, 
+                distance: 25, 
+                speed: 0.015, 
+                rotationSpeed: 0.002,
+                emissive: 0xFFA07A,
+                emissiveIntensity: 0.4,
+                info: "Самая горячая планета (470°C). Атмосфера из CO₂ с давлением в 92 раза больше земного. Вращается в обратную сторону.",
+                link: 'venus.html'
+            },
+            { 
+                name: "Земля", 
+                radius: 3.9, 
+                color: 0x1E90FF, 
+                distance: 35, 
+                speed: 0.01, 
+                rotationSpeed: 0.02,
+                emissive: 0x1E90FF,
+                emissiveIntensity: 0.3,
+                info: "Единственная известная планета с жизнью. 71% поверхности покрыт водой. Имеет 1 естественный спутник - Луну.",
+                link: 'earth.html'
+            },
+            { 
+                name: "Марс", 
+                radius: 2.1, 
+                color: 0xFF4500, 
+                distance: 45, 
+                speed: 0.008, 
+                rotationSpeed: 0.018,
+                emissive: 0xFF4500,
+                emissiveIntensity: 0.3,
+                info: "Красная планета с самой высокой горой (Олимп, 21 км) и крупнейшим каньоном (Долина Маринера, 4000 км).",
+                link: 'mars.html'
+            },
+            { 
+                name: "Юпитер", 
+                radius: 8, 
+                color: 0xF5DEB3, 
+                distance: 60, 
+                speed: 0.002, 
+                rotationSpeed: 0.04,
+                emissive: 0xF5DEB3,
+                emissiveIntensity: 0.5,
+                info: "Самая большая планета (в 11 раз больше Земли). Имеет 79 спутников и слабую кольцевую систему.",
+                link: 'jupiter.html'
+            },
+            { 
+                name: "Сатурн", 
+                radius: 7, 
+                color: 0xF4A460, 
+                distance: 75, 
+                speed: 0.0009, 
+                rotationSpeed: 0.038,
+                emissive: 0xF4A460,
+                emissiveIntensity: 0.5,
+                info: "Известен своими кольцами из льда и камней. Имеет 82 спутника, включая Титан с плотной атмосферой.",
+                link: 'saturn.html'
+            },
+            { 
+                name: "Уран", 
+                radius: 5, 
+                color: 0x7FFFD4, 
+                distance: 90, 
+                speed: 0.0004, 
+                rotationSpeed: 0.03,
+                emissive: 0x7FFFD4,
+                emissiveIntensity: 0.4,
+                info: "Вращается на боку (наклон 98°). Температура атмосферы около -224°C. Имеет 27 спутников.",
+                link: 'uranus.html'
+            },
+            { 
+                name: "Нептун", 
+                radius: 4.9, 
+                color: 0x4169E1, 
+                distance: 105, 
+                speed: 0.0001, 
+                rotationSpeed: 0.032,
+                emissive: 0x4169E1,
+                emissiveIntensity: 0.4,
+                info: "Самая ветреная планета (до 2100 км/ч). Имеет 14 спутников, включая Тритон с криовулканами.",
+                link: 'neptune.html'
+            }
+        ];
+
+        // Создание планет
+        const planetObjects = [];
+        const orbits = [];
+
+        planets.forEach((planet, index) => {
+            const geometry = new THREE.SphereGeometry(planet.radius, 64, 64);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: planet.color,
+                emissive: planet.emissive,
+                emissiveIntensity: planet.emissiveIntensity,
+                roughness: 0.1,
+                metalness: 0.1
+            });
+            
+            const sphere = new THREE.Mesh(geometry, material);
+            
+            if (index === 0) { // Солнце
+                // Усиленное свечение Солнца
+                const sunLight = new THREE.PointLight(planet.color, 2, 200);
+                scene.add(sunLight);
+                scene.add(sphere);
+            } else {
+                // Орбита
+                const orbitGeometry = new THREE.BufferGeometry();
+                const orbitMaterial = new THREE.LineBasicMaterial({ 
+                    color: 0x333333,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const points = [];
+                const segments = 128;
+                
+                for (let i = 0; i <= segments; i++) {
+                    const theta = (i / segments) * Math.PI * 2;
+                    points.push(new THREE.Vector3(
+                        Math.cos(theta) * planet.distance,
+                        0,
+                        Math.sin(theta) * planet.distance
+                    ));
+                }
+                
+                orbitGeometry.setFromPoints(points);
+                const orbit = new THREE.Line(orbitGeometry, orbitMaterial);
+                scene.add(orbit);
+                orbits.push(orbit);
+                
+                // Планета
+                sphere.position.x = planet.distance;
+                scene.add(sphere);
+            }
+            
+            planetObjects.push({
+                mesh: sphere,
+                data: planet,
+                angle: Math.random() * Math.PI * 2
+            });
+        });
+
+        // Добавление колец Сатурну
+        const saturn = planetObjects[6].mesh;
+        const ringGeometry = new THREE.RingGeometry(7, 10, 64);
+        const ringMaterial = new THREE.MeshStandardMaterial({
+            color: 0xC0C0C0,
+            side: THREE.DoubleSide,
+            emissive: 0xC0C0C0,
+            emissiveIntensity: 0.3,
+            roughness: 0.5,
+            metalness: 0.5
+        });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.rotation.x = Math.PI / 2;
+        saturn.add(ring);
+
+        // Анимация
+        let timeSpeed = 1;
+        let isPaused = false;
+        let selectedPlanet = null;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (!isPaused) {
+                planetObjects.forEach((planet, index) => {
+                    if (index !== 0) { // Не двигаем Солнце
+                        planet.angle += planet.data.speed * timeSpeed;
+                        planet.mesh.position.x = Math.cos(planet.angle) * planet.data.distance;
+                        planet.mesh.position.z = Math.sin(planet.angle) * planet.data.distance;
+                    }
+                    planet.mesh.rotation.y += planet.data.rotationSpeed * timeSpeed;
+                });
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Обработка событий
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        document.getElementById('speed-up').addEventListener('click', () => {
+            timeSpeed *= 1.5;
+            updateSpeedButtons();
+        });
+
+        document.getElementById('speed-down').addEventListener('click', () => {
+            timeSpeed /= 1.5;
+            updateSpeedButtons();
+        });
+
+        document.getElementById('pause').addEventListener('click', () => {
+            isPaused = !isPaused;
+            document.getElementById('pause').textContent = isPaused ? "Продолжить (▶)" : "Пауза (⏸)";
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            controls.reset();
+            camera.position.set(0, 50, 150);
+            timeSpeed = 1;
+            isPaused = false;
+            document.getElementById('pause').textContent = "Пауза (⏸)";
+            updateSpeedButtons();
+        });
+
+        function updateSpeedButtons() {
+            document.getElementById('speed-up').textContent = `Ускорить (×${timeSpeed.toFixed(1)})`;
+            document.getElementById('speed-down').textContent = `Замедлить (÷${timeSpeed.toFixed(1)})`;
+        }
+
+        // Взаимодействие с планетами
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const planetInfo = document.getElementById('planet-info');
+
+        function onMouseClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(planetObjects.map(p => p.mesh));
+            
+            if (intersects.length > 0) {
+                const planet = planetObjects.find(p => p.mesh === intersects[0].object);
+                selectedPlanet = planet;
+                planetInfo.innerHTML = `
+                    <h3>${planet.data.name}</h3>
+                    <p>${planet.data.info}</p>
+                    <a href="${planet.data.link}" target="_blank">Подробнее о ${planet.data.name} →</a>
+                `;
+                planetInfo.style.display = 'block';
+                
+                // Анимация выделения планеты
+                planet.mesh.material.emissiveIntensity = planet.data.emissiveIntensity * 2;
+                setTimeout(() => {
+                    if (planet.mesh.material) {
+                        planet.mesh.material.emissiveIntensity = planet.data.emissiveIntensity;
+                    }
+                }, 500);
+            } else {
+                planetInfo.style.display = 'none';
+                selectedPlanet = null;
+            }
+        }
+
+        window.addEventListener('click', onMouseClick, false);
+
+        // Добавляем обработчик для закрытия информации о планете при клике вне планеты
+        window.addEventListener('mousedown', (event) => {
+            if (event.button === 0) { // Только левая кнопка мыши
+                const isClickOnPlanet = planetObjects.some(planet => 
+                    planet.mesh === raycaster.intersectObjects([planet.mesh])[0]?.object
+                );
+                
+                if (!isClickOnPlanet) {
+                    planetInfo.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
