@@ -19,25 +19,99 @@ body {
     background-position: 0 0, 40px 60px, 130px 270px;
 }
 
+/* Общие стили для логотипа */
 .logo {
-    position: fixed;
-    top: 20px;
-    left: 30px;
-    font-size: 28px;
-    font-weight: 700;
-    z-index: 101;
-    background: linear-gradient(135deg, #00a2ff, #0071e3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: flex;
-    align-items: center;
+  position: fixed;
+  top: 20px;
+  left: 30px;
+  font-weight: 700;
+  z-index: 101;
+  background: linear-gradient(135deg, #00a2ff, #0071e3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
 }
 
 .logo::before {
-    content: "✦";
-    margin-right: 10px;
-    font-size: 24px;
-    animation: twinkle 2s infinite alternate;
+  content: "✦";
+  margin-right: 10px;
+  animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Адаптивные размеры для разных устройств */
+@media (min-width: 1200px) {
+  .logo {
+      font-size: 28px;
+  }
+  .logo::before {
+      font-size: 24px;
+  }
+}
+
+@media (max-width: 1199px) and (min-width: 992px) {
+  .logo {
+      font-size: 24px;
+  }
+  .logo::before {
+      font-size: 20px;
+  }
+}
+
+@media (max-width: 991px) and (min-width: 768px) {
+  .logo {
+      font-size: 20px;
+      left: 20px;
+      top: 15px;
+  }
+  .logo::before {
+      font-size: 16px;
+      margin-right: 8px;
+  }
+}
+
+@media (max-width: 767px) {
+  .logo {
+      font-size: 18px;
+      left: 15px;
+      top: 10px;
+  }
+  .logo::before {
+      font-size: 14px;
+      margin-right: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+      font-size: 16px;
+      left: 10px;
+      top: 10px;
+  }
+  .logo::before {
+      font-size: 12px;
+      margin-right: 3px;
+  }
+}
+
+/* Для очень маленьких экранов можно скрыть символ */
+@media (max-width: 360px) {
+  .logo::before {
+      display: none;
+  }
+}
+
+/* Стили для светлой темы (если нужно) */
+body.light-theme .logo {
+  background: linear-gradient(135deg, #0071e3, #003366);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @keyframes twinkle {

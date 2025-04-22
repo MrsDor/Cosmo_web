@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Источники | COSMO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 1px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 1px),
+                radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 1px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+        }
+
+        body.light-theme {
+            background-color: #f5f5f5;
+            color: #333;
+            background-image: 
+                radial-gradient(black, rgba(0,0,0,.1) 1px, transparent 1px),
+                radial-gradient(black, rgba(0,0,0,.08) 1px, transparent 1px),
+                radial-gradient(black, rgba(0,0,0,.05) 1px, transparent 1px);
+        }
+
+        /* Theme Switch */
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        body.light-theme .theme-switch {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-switch:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-switch i {
+            font-size: 24px;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        body.light-theme .theme-switch i {
+            color: #333;
+        }
+
+        /* Общие стили для логотипа */
+        .logo {
+            position: fixed;
+            top: 20px;
+            left: 30px;
+            font-weight: 700;
+            z-index: 101;
+            background: linear-gradient(135deg, #00a2ff, #0071e3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo::before {
+            content: "✦";
+            margin-right: 10px;
+            animation: twinkle 2s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Адаптивные размеры для разных устройств */
+        @media (min-width: 1200px) {
+            .logo {
+                font-size: 28px;
+            }
+            .logo::before {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 1199px) and (min-width: 992px) {
+            .logo {
+                font-size: 24px;
+            }
+            .logo::before {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 991px) and (min-width: 768px) {
+            .logo {
+                font-size: 20px;
+                left: 20px;
+                top: 15px;
+            }
+            .logo::before {
+                font-size: 16px;
+                margin-right: 8px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .logo {
+                font-size: 18px;
+                left: 15px;
+                top: 10px;
+            }
+            .logo::before {
+                font-size: 14px;
+                margin-right: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 16px;
+                left: 10px;
+                top: 10px;
+            }
+            .logo::before {
+                font-size: 12px;
+                margin-right: 3px;
+            }
+        }
+
+        /* Для очень маленьких экранов можно скрыть символ */
+        @media (max-width: 360px) {
+            .logo::before {
+                display: none;
+            }
+        }
+
+        /* Стили для светлой темы (если нужно) */
+        body.light-theme .logo {
+            background: linear-gradient(135deg, #0071e3, #003366);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            backdrop-filter: blur(10px);
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-theme nav {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        body.light-theme nav a {
+            color: #333;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #00a2ff, #0071e3);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        nav a:hover {
+            color: #00a2ff;
+        }
+
+        body.light-theme nav a:hover {
+            color: #0071e3;
+        }
+
+        .content-page {
+            display: block;
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            background-color: transparent;
+            z-index: 1;
+            padding: 120px 50px 50px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s forwards 0.3s;
+        }
+
+        body.light-theme .page-title {
+            background: linear-gradient(90deg, #333, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #00a2ff, #0071e3);
+            border-radius: 3px;
+        }
+
+        .page-subtitle {
+            font-size: 20px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s forwards 0.5s;
+        }
+
+        body.light-theme .page-subtitle {
+            opacity: 0.9;
+        }
+
+        /* Источники */
+        .sources-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .source-category {
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s forwards;
+        }
+
+        .source-category:nth-child(1) { animation-delay: 0.7s; }
+        .source-category:nth-child(2) { animation-delay: 0.9s; }
+        .source-category:nth-child(3) { animation-delay: 1.1s; }
+        .source-category:nth-child(4) { animation-delay: 1.3s; }
+
+        .category-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 162, 255, 0.3);
+            background: linear-gradient(90deg, #00a2ff, #0071e3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        body.light-theme .category-title {
+            background: linear-gradient(90deg, #0071e3, #003366);
+            -webkit-background-clip: text;
+        }
+
+        .source-list {
+            list-style-type: none;
+        }
+
+        .source-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        body.light-theme .source-item {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .source-item:hover {
+            transform: translateX(5px);
+            background: rgba(0, 162, 255, 0.1);
+            border-left: 3px solid #00a2ff;
+        }
+
+        body.light-theme .source-item:hover {
+            background: rgba(0, 113, 227, 0.1);
+            border-left: 3px solid #0071e3;
+        }
+
+        .source-link {
+            color: #00a2ff;
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        body.light-theme .source-link {
+            color: #0071e3;
+        }
+
+        .source-link:hover {
+            text-decoration: underline;
+        }
+
+        .source-description {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        body.light-theme .source-description {
+            opacity: 0.9;
+        }
+
+        /* Футер */
+        .footer {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-theme .footer {
+            background: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 18px;
+        }
+
+        body.light-theme .social-link {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .social-link:hover {
+            background: #00a2ff;
+            transform: translateY(-3px) scale(1.1);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 162, 255, 0.3);
+        }
+
+        body.light-theme .social-link:hover {
+            background: #0071e3;
+            box-shadow: 0 5px 15px rgba(0, 113, 227, 0.3);
+        }
+
+        .copyright {
+            font-size: 14px;
+            opacity: 0.6;
+            margin-top: 20px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 36px;
+            }
+            
+            .page-subtitle {
+                font-size: 18px;
+            }
+            
+            nav ul {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 0 10px;
+            }
+
+            nav a {
+                font-size: 13px;
+            }
+
+            .category-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 30px;
+            }
+            
+            .content-page {
+                padding: 120px 20px 50px;
+            }
+            
+            .source-item {
+                padding: 12px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <button class="theme-switch" id="themeSwitch">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <div class="logo">COSMO</div>
+    
+    <nav>
+        <ul>
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="model.html">Солнечная система</a></li>
+            <li><a href="cosmonavts.html">Космонавты</a></li>
+            <li><a href="ссс.html">Явления</a></li>
+            <li><a href="stars.html">Звезды</a></li>
+            <li><a href="resurs.html" class="active">Источники</a></li>
+        </ul>
+    </nav>
+    
+    <div class="content-page">
+        <div class="page-header">
+            <h1 class="page-title">Источники</h1>
+            <p class="page-subtitle">Материалы и ресурсы, использованные при создании сайта</p>
+        </div>
+        
+        <div class="sources-container">
+            <div class="source-category">
+                <h2 class="category-title">Космонавтика и история</h2>
+                <ul class="source-list">
+                    <li class="source-item">
+                        <a href="https://www.roscosmos.ru/" class="source-link" target="_blank">Роскосмос (официальный сайт)</a>
+                        <p class="source-description">Официальный сайт государственной корпорации по космической деятельности. Информация о российских космонавтах и программах.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://www.nasa.gov/" class="source-link" target="_blank">NASA (официальный сайт)</a>
+                        <p class="source-description">Национальное управление по аэронавтике и исследованию космического пространства США. Материалы о космических миссиях и астронавтах.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://ru.wikipedia.org/wiki/Космонавтика" class="source-link" target="_blank">Википедия: Космонавтика</a>
+                        <p class="source-description">Обширная информация по истории космонавтики, биографии космонавтов и хронологии полетов.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://gctc.ru/" class="source-link" target="_blank">Центр подготовки космонавтов</a>
+                        <p class="source-description">Официальный сайт Центра подготовки космонавтов имени Ю.А. Гагарина.</p>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="source-category">
+                <h2 class="category-title">Астрономия и наука</h2>
+                <ul class="source-list">
+                    <li class="source-item">
+                        <a href="https://www.esa.int/" class="source-link" target="_blank">Европейское космическое агентство (ESA)</a>
+                        <p class="source-description">Научные данные и исследования о космосе, планетах и звездах.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://www.skyandtelescope.com/" class="source-link" target="_blank">Sky & Telescope</a>
+                        <p class="source-description">Авторитетный ресурс по астрономии с научно-популярными статьями.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://www.space.com/" class="source-link" target="_blank">Space.com</a>
+                        <p class="source-description">Последние новости и открытия в области астрономии и космонавтики.</p>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="source-category">
+                <h2 class="category-title">Изображения и медиа</h2>
+                <ul class="source-list">
+                    <li class="source-item">
+                        <a href="https://www.nasa.gov/multimedia/imagegallery/index.html" class="source-link" target="_blank">NASA Image Gallery</a>
+                        <p class="source-description">Официальная галерея изображений NASA с высоким разрешением.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://www.eso.org/public/images/" class="source-link" target="_blank">ESO Image Gallery</a>
+                        <p class="source-description">Фотографии космоса от Европейской южной обсерватории.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://unsplash.com/s/photos/space" class="source-link" target="_blank">Unsplash Space</a>
+                        <p class="source-description">Бесплатные стоковые изображения космоса и астрономии.</p>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="source-category">
+                <h2 class="category-title">Технические ресурсы</h2>
+                <ul class="source-list">
+                    <li class="source-item">
+                        <a href="https://developer.mozilla.org/" class="source-link" target="_blank">MDN Web Docs</a>
+                        <p class="source-description">Документация по HTML, CSS и JavaScript, использованная при разработке сайта.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://fontawesome.com/" class="source-link" target="_blank">Font Awesome</a>
+                        <p class="source-description">Иконки и символы, использованные в дизайне сайта.</p>
+                    </li>
+                    <li class="source-item">
+                        <a href="https://fonts.google.com/" class="source-link" target="_blank">Google Fonts</a>
+                        <p class="source-description">Шрифты, использованные на сайте.</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Переключение темы
+        const themeSwitch = document.getElementById('themeSwitch');
+        const icon = themeSwitch.querySelector('i');
+        
+        themeSwitch.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-theme');
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        }
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
